@@ -152,7 +152,14 @@
                 setTimeout(() => particle.remove(), 800);
             }
         }
+        // Add this inside your handleTouch function after msgIndex updates
+if (msgIndex === 0) { // Every time she completes the loop of messages
+    const cameraHint = document.createElement('p');
+    cameraHint.innerHTML = '<a href="camera.html" style="color: #d63384; font-weight: bold;">Wait, want to see the real teddy? Click here! 📸</a>';
+    document.getElementById('surprise-content').appendChild(cameraHint);
+}
     </script>
 </body>
 </html>
+
 
