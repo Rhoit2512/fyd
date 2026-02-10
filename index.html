@@ -8,16 +8,55 @@
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
     <style>
         #surprise-content { display: none; }
+        
+        .teddy-container {
+            position: relative;
+            margin: 20px 0;
+        }
+
         .big-teddy {
-            font-size: 120px;
+            font-size: 100px;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: transform 0.1s;
             user-select: none;
             display: inline-block;
+            z-index: 5;
+            position: relative;
         }
-        .big-teddy:active { transform: scale(1.2) rotate(5deg); }
-        .tap-hint { font-size: 0.8rem; color: var(--dark-pink); animation: blink 1.5s infinite; }
-        @keyframes blink { 50% { opacity: 0.3; } }
+
+        .big-teddy:active { transform: scale(1.2); }
+
+        /* Floating Message Style */
+        .love-message {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark-pink);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            white-space: nowrap;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            animation: floatUp 1.5s ease-out forwards;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 0; transform: translate(-50%, 0); }
+            20% { opacity: 1; transform: translate(-50%, -20px); }
+            100% { opacity: 0; transform: translate(-50%, -60px); }
+        }
+
+        .tap-hint { 
+            font-size: 0.8rem; 
+            color: var(--dark-pink); 
+            margin-top: 10px;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -31,54 +70,86 @@
     <div class="container">
         <div id="intro-card" class="card">
             <h1>Hey Cutie...</h1>
-            <p>I couldn't gift you a physical teddy bear today, so I made you something even better.</p>
+            <p>I couldn't gift you a real teddy bear today, so I built you a magical one instead.</p>
             <button class="btn" onclick="showTeddy()">Open Your Gift 🎁</button>
         </div>
 
         <div id="surprise-content" class="card">
-            <h1 style="font-size: 1.5rem;">Here is your Teddy!</h1>
-            <div class="big-teddy" onclick="popLove(event)">🧸</div>
-            <p class="tap-hint">Tap him for hugs!</p>
-            <p>He's small, but he carries all my love.</p>
+            <h1 style="font-size: 1.5rem;">Your Virtual Teddy</h1>
+            
+            <div class="teddy-container" id="teddy-area">
+                <div class="big-teddy" onclick="handleTouch(event)" ontouchstart="handleTouch(event)">🧸</div>
+            </div>
+
+            <p class="tap-hint">Tap him for a surprise! ✨</p>
+            <p style="font-size: 0.9rem; color: #888;">(He has a lot to tell you...)</p>
         </div>
     </div>
 
     <script>
+        const messages = [
+            "You're so cute! ❤️",
+            "Give me a hug? 🤗",
+            "I love you! ✨",
+            "You're my favorite! 🌸",
+            "Sending a kiss! 💋",
+            "You're the best! 🧸",
+            "Miss you tons! ☁️",
+            "My heart is yours! 💖",
+            "Stay happy always! 🌈",
+            "Cuddles loading... 🔄"
+        ];
+
+        let msgIndex = 0;
+
         function showTeddy() {
             document.getElementById('intro-card').style.display = 'none';
             document.getElementById('surprise-content').style.display = 'block';
         }
 
-        function popLove(e) {
-            // Create small floating hearts/teddies where touched
-            for(let i=0; i<6; i++) {
+        function handleTouch(e) {
+            // Prevent multiple triggers from touch + click
+            e.preventDefault();
+            
+            // 1. Show the lovely message
+            const area = document.getElementById('teddy-area');
+            const msg = document.createElement('div');
+            msg.className = 'love-message';
+            msg.innerText = messages[msgIndex];
+            area.appendChild(msg);
+            
+            // Cycle through messages
+            msgIndex = (msgIndex + 1) % messages.length;
+
+            // Remove message after animation
+            setTimeout(() => msg.remove(), 1500);
+
+            // 2. Create the heart burst
+            const rect = e.target.getBoundingClientRect();
+            const x = e.clientX || (e.touches ? e.touches[0].clientX : rect.left + rect.width / 2);
+            const y = e.clientY || (e.touches ? e.touches[0].clientY : rect.top + rect.height / 2);
+
+            for(let i=0; i<5; i++) {
                 const particle = document.createElement('div');
-                const isTeddy = Math.random() > 0.5;
-                particle.innerHTML = isTeddy ? '🧸' : '❤️';
+                particle.innerHTML = Math.random() > 0.5 ? '❤️' : '✨';
                 particle.style.position = 'fixed';
-                
-                // Position at the click/touch point
-                const x = e.clientX || e.touches[0].clientX;
-                const y = e.clientY || e.touches[0].clientY;
-                
                 particle.style.left = x + 'px';
                 particle.style.top = y + 'px';
-                particle.style.fontSize = '24px';
+                particle.style.fontSize = '20px';
                 particle.style.pointerEvents = 'none';
                 particle.style.zIndex = '3000';
-                particle.style.transition = 'all 1s ease-out';
+                particle.style.transition = 'all 0.8s ease-out';
                 
                 document.body.appendChild(particle);
 
-                // Animate outwards
                 setTimeout(() => {
-                    const destinationX = (Math.random() - 0.5) * 300;
-                    const destinationY = (Math.random() - 0.5) * 300 - 100;
-                    particle.style.transform = `translate(${destinationX}px, ${destinationY}px) scale(0) rotate(360deg)`;
+                    const destX = (Math.random() - 0.5) * 200;
+                    const destY = (Math.random() - 0.5) * 200 - 50;
+                    particle.style.transform = `translate(${destX}px, ${destY}px) scale(0)`;
                     particle.style.opacity = '0';
                 }, 10);
 
-                setTimeout(() => particle.remove(), 1000);
+                setTimeout(() => particle.remove(), 800);
             }
         }
     </script>
