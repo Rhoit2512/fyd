@@ -3,9 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Teddy Day 🧸</title>
+    <title>A Surprise for You 🧸</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        #surprise-content { display: none; }
+        .big-teddy {
+            font-size: 120px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            user-select: none;
+            display: inline-block;
+        }
+        .big-teddy:active { transform: scale(1.2) rotate(5deg); }
+        .tap-hint { font-size: 0.8rem; color: var(--dark-pink); animation: blink 1.5s infinite; }
+        @keyframes blink { 50% { opacity: 0.3; } }
+    </style>
 </head>
 <body>
     <nav>
@@ -14,30 +27,58 @@
         <a href="gallery.html">📸 Pics</a>
         <a href="gifts.html">🎟️ Gifts</a>
     </nav>
+
     <div class="container">
-        <div class="card">
-            <div style="font-size: 70px;">🧸</div>
-            <h1>Happy Teddy Day!</h1>
-            <p>You're the softest, cutest, and most huggable person I've ever met.</p>
-            <button class="btn" onclick="teddyRain()">Send Bear Hugs!</button>
+        <div id="intro-card" class="card">
+            <h1>Hey Cutie...</h1>
+            <p>I couldn't gift you a physical teddy bear today, so I made you something even better.</p>
+            <button class="btn" onclick="showTeddy()">Open Your Gift 🎁</button>
+        </div>
+
+        <div id="surprise-content" class="card">
+            <h1 style="font-size: 1.5rem;">Here is your Teddy!</h1>
+            <div class="big-teddy" onclick="popLove(event)">🧸</div>
+            <p class="tap-hint">Tap him for hugs!</p>
+            <p>He's small, but he carries all my love.</p>
         </div>
     </div>
+
     <script>
-        function teddyRain() {
-            for(let i=0; i<15; i++) {
+        function showTeddy() {
+            document.getElementById('intro-card').style.display = 'none';
+            document.getElementById('surprise-content').style.display = 'block';
+        }
+
+        function popLove(e) {
+            // Create small floating hearts/teddies where touched
+            for(let i=0; i<6; i++) {
+                const particle = document.createElement('div');
+                const isTeddy = Math.random() > 0.5;
+                particle.innerHTML = isTeddy ? '🧸' : '❤️';
+                particle.style.position = 'fixed';
+                
+                // Position at the click/touch point
+                const x = e.clientX || e.touches[0].clientX;
+                const y = e.clientY || e.touches[0].clientY;
+                
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.fontSize = '24px';
+                particle.style.pointerEvents = 'none';
+                particle.style.zIndex = '3000';
+                particle.style.transition = 'all 1s ease-out';
+                
+                document.body.appendChild(particle);
+
+                // Animate outwards
                 setTimeout(() => {
-                    const t = document.createElement('div');
-                    t.innerHTML = '🧸';
-                    t.style.position = 'fixed';
-                    t.style.left = Math.random() * 90 + 'vw';
-                    t.style.top = '-50px';
-                    t.style.fontSize = '40px';
-                    t.style.zIndex = '2000';
-                    t.style.transition = 'all 2.5s linear';
-                    document.body.appendChild(t);
-                    setTimeout(() => { t.style.top = '110vh'; t.style.transform = 'rotate(360deg)'; }, 50);
-                    setTimeout(() => t.remove(), 2600);
-                }, i * 150);
+                    const destinationX = (Math.random() - 0.5) * 300;
+                    const destinationY = (Math.random() - 0.5) * 300 - 100;
+                    particle.style.transform = `translate(${destinationX}px, ${destinationY}px) scale(0) rotate(360deg)`;
+                    particle.style.opacity = '0';
+                }, 10);
+
+                setTimeout(() => particle.remove(), 1000);
             }
         }
     </script>
